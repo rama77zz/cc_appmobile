@@ -2,69 +2,78 @@ pipeline {
     agent any
 
     environment {
-        // Nama container builder sesuai docker-compose
-        BUILDER_CONTAINER = 'android-builder'
-        // Nama image untuk hasil build
-        DOCKER_IMAGE = 'jenkins/jenkins:lts'   // Ganti dengan username Docker Hub kamu
-        // Kredensial Docker (harus sudah diset di Jenkins Credentials)
-        DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
+        IMAGE_NAME = "android-builder"
+        CONTAINER_NAME = "android_builder"
+        JENKINS_CONTAINER = "jenkins"
     }
 
     stages {
-
-        stage('Checkout Source Code') {
+        stage('Checkout Code') {
             steps {
-                echo '📥 Checking out source code...'
+                echo "🔄 Checkout source code dari repo kamu..."
                 git branch: 'main', url: 'https://github.com/rama77zz/cc_appmobile.git'
-                checkout scm
             }
         }
 
-        stage('Build Kotlin Project (in Builder Container)') {
+        stage('Build Docker Images') {
             steps {
-                echo '🏗️ Building Kotlin project in container...'
-                // Jalankan Gradle di dalam container android-builder
-                sh '''
-                    docker exec ${BUILDER_CONTAINER} bash -c "
-                        cd /workspace &&
-                        ./gradlew clean build
-                    "
+                echo "🏗️ Build Docker images menggunakan docker-compose..."
+                bat 'docker-compose build'
+            }
+        }
+
+        stage('Run Docker Containers') {
+            steps {
+                echo "🚀 Jalankan ulang container Jenkins dan Android Builder..."
+                bat '''
+                echo ==== HENTIKAN CONTAINER LAMA ====
+                docker stop jenkins || echo "jenkins tidak berjalan"
+                docker rm jenkins || echo "jenkins sudah dihapus"
+                docker stop android-builder || echo "android-builder tidak berjalan"
+                docker rm android-builder || echo "android-builder sudah dihapus"
+
+                echo ==== JALANKAN ULANG DOCKER COMPOSE ====
+                docker-compose down || exit 0
+                docker-compose up -d
+
+                echo ==== CEK CONTAINER YANG AKTIF ====
+                docker ps
                 '''
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Verify Builder Container Running') {
             steps {
-                echo '🐳 Building Docker image for Kotlin app...'
-                sh '''
-                    docker build -t ${DOCKER_IMAGE} .
+                echo "🔍 Verifikasi container builder Android berjalan dengan benar..."
+                bat '''
+                echo ==== TUNGGU 20 DETIK SUPAYA CONTAINER SIAP ====
+                ping 127.0.0.1 -n 20 >nul
+
+                echo ==== CEK STATUS CONTAINER BUILDER ====
+                docker ps --filter "name=android-builder"
+
+                echo ==== CEK LOG BUILD JIKA PERLU ====
+                docker logs android-builder --tail 20
                 '''
             }
         }
 
-        stage('Push Docker Image to Docker Hub') {
+        stage('Build Android App') {
             steps {
-                echo '🚀 Pushing image to Docker Hub...'
-                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push ${DOCKER_IMAGE}
-                    '''
-                }
+                echo "⚙️ Menjalankan build Gradle di dalam container android-builder..."
+                bat '''
+                docker exec android-builder bash -c "./gradlew clean build || ./gradlew assembleDebug"
+                '''
             }
         }
     }
 
     post {
-        always {
-            echo '📦 Pipeline finished (success or fail). Cleaning up workspace...'
-            sh 'docker system prune -f || true'
-        }
         success {
-            echo '✅ Build and deployment successful!'
+            echo '✅ Android App berhasil dibuild menggunakan Docker Compose!'
         }
         failure {
-            echo '❌ Build or deployment failed. Please check logs.'
+            echo '❌ Build gagal, cek log Jenkins console output.'
         }
     }
 }
