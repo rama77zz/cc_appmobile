@@ -15,6 +15,7 @@ pipeline {
         stage('Checkout Source Code') {
             steps {
                 echo '📥 Checking out source code...'
+                git branch: 'main', url: 'https://github.com/rama77zz/cc_appmobile.git'
                 checkout scm
             }
         }
