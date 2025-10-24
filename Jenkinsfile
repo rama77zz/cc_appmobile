@@ -5,7 +5,7 @@ pipeline {
         // Nama container builder sesuai docker-compose
         BUILDER_CONTAINER = 'android-builder'
         // Nama image untuk hasil build
-        DOCKER_IMAGE = 'username/simpleapp:latest'   // Ganti dengan username Docker Hub kamu
+        DOCKER_IMAGE = 'jenkins/jenkins:lts'   // Ganti dengan username Docker Hub kamu
         // Kredensial Docker (harus sudah diset di Jenkins Credentials)
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
     }
