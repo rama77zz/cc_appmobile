@@ -30,8 +30,8 @@ pipeline {
                 echo ==== HENTIKAN CONTAINER LAMA ====
                 docker stop jenkins || echo "jenkins tidak berjalan"
                 docker rm jenkins || echo "jenkins sudah dihapus"
-                docker stop android-builder || echo "android-builder tidak berjalan"
-                docker rm android-builder || echo "android-builder sudah dihapus"
+                docker stop android-builder || echo "android-builder1 tidak berjalan"
+                docker rm android-builder || echo "android-builder1 sudah dihapus"
 
                 echo ==== JALANKAN ULANG DOCKER COMPOSE ====
                 docker-compose down || exit 0
@@ -51,10 +51,10 @@ pipeline {
                 ping 127.0.0.1 -n 20 >nul
 
                 echo ==== CEK STATUS CONTAINER BUILDER ====
-                docker ps --filter "name=android-builder"
+                docker ps --filter "name=android-builder1"
 
                 echo ==== CEK LOG BUILD JIKA PERLU ====
-                docker logs android-builder --tail 20
+                docker logs android-builder1 --tail 20
                 '''
             }
         }
@@ -63,7 +63,7 @@ pipeline {
             steps {
                 echo "⚙️ Menjalankan build Gradle di dalam container android-builder1..."
                 bat '''
-                docker exec android-builder bash -c "./gradlew clean build || ./gradlew assembleDebug"
+                docker exec android-builder1 bash -c "./gradlew clean build || ./gradlew assembleDebug"
                 '''
             }
         }
@@ -79,5 +79,6 @@ pipeline {
     }
 
 }
+
 
 
