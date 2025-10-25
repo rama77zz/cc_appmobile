@@ -3,9 +3,23 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:8.1.0"
+        classpath "com.android.tools.build:gradle:8.7.2"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0"
     }
+}
+
+// 🔧 Pastikan semua subproject (seperti :app) tahu tempat download dependensinya
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// ✅ Optional, bisa kosong kalau tidak perlu tugas tambahan
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }
