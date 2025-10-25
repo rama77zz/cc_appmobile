@@ -1,14 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  PERHATIKAN: Atribut 'package="...com..."' telah dihapus dari tag <manifest> di bawah.
+  Ini adalah rekomendasi dari log build Anda.
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.simpleapp">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:label="SimpleApp"
-        android:allowBackup="true">
-        <activity android:name=".MainActivity">
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SimpleApp"
+        tools:targetApi="31">
+        
+        <!-- 
+          INI ADALAH SOLUSINYA:
+          Menambahkan 'android:exported="true"' wajib untuk Activity
+          yang memiliki <intent-filter> jika menargetkan Android 12 (SDK 31) atau lebih tinggi.
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"> 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
+
 </manifest>
