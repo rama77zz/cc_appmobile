@@ -63,7 +63,7 @@ pipeline {
             steps {
                 echo "⚙️ Menjalankan build Gradle di dalam container android-builder1..."
                 bat '''
-                docker exec android-builder1 bash -c "./gradlew clean build || ./gradlew assembleDebug"
+                docker exec android-builder1 bash -c "./gradlew clean build"
                 '''
             }
         }
@@ -79,6 +79,7 @@ pipeline {
     }
 
 }
+
 
 
 
