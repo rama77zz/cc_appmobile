@@ -10,6 +10,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val tv = findViewById<TextView>(R.id.helloText)
-        tv.text = "Hello from Docker & Jenkins!"
+        tv.text = "Hello from Jannat!"
     }
 }
